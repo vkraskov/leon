@@ -6,6 +6,9 @@
       name: 
         - "{{ oracle_database_preinstall_pkg }}"
 
+  - name: "add .vimrc for oracle user"
+    template: src=files/vimrc dest=/home/oracle/.vimrc owner=oracle group=oinstall mode="600"
+
   - name: Making oraenv
     template:
       src: oraenv
