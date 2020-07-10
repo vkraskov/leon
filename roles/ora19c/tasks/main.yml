@@ -1,0 +1,101 @@
+---
+  - name: Install oracle database preinstall software package "{{ oracle_database_preinstall_pkg }}"
+    become: true
+    yum:
+      state: present
+      name: 
+        - "{{ oracle_database_preinstall_pkg }}"
+
+  - name: Making oraenv
+    template:
+      src: oraenv
+      dest: /home/oracle/.oraenv
+  
+  - name: Copy oracle server package from "{{ oracle_rmp_directory }}{{ oracle_database_server_pkg }}" to remote server 
+    become: true
+    synchronize:
+      src: "{{ oracle_rmp_directory }}{{ oracle_database_server_pkg }}"
+      dest: /home/oracle
+
+  - name: Set permissions on rpm
+    file:
+      path: "/home/oracle/{{ oracle_database_server_pkg }}"
+      owner: oracle
+      group: oinstall
+      mode: '644'
+
+  - name: install rpm from a local file
+    yum:
+      name: "/home/oracle/{{ oracle_database_server_pkg }}"
+      state: present
+
+  - name: Copying db create file with owner and permissions
+    copy:
+      remote_src: yes
+      mode: preserve
+      src: "/etc/init.d/oracledb_ORCLCDB-19c"
+      dest: "/etc/init.d/oracledb_{{ oracle_sid }}-19c"
+
+  - name: Copying db config file with owner and permissions
+    copy:
+      remote_src: yes
+      mode: preserve
+      src: "/etc/sysconfig/oracledb_ORCLCDB-19c.conf"
+      dest: "/etc/sysconfig/oracledb_{{ oracle_sid }}-19c.conf"
+
+  - name: Setting oracle sid to {{ oracle_sid }} 
+    lineinfile:
+      path: "/etc/init.d/oracledb_{{ oracle_sid }}-19c"
+      regexp: '^export ORACLE_SID='
+      line: "export ORACLE_SID={{ oracle_sid }}"
+
+  - name: Setting CDB to {{ oracle_cdb }} 
+    lineinfile:
+      path: "/etc/init.d/oracledb_{{ oracle_sid }}-19c"
+      regexp: '^export CREATE_AS_CDB='
+      line: "export CREATE_AS_CDB={{ oracle_cdb }}"
+
+  - name: Setting oracle charset to {{ oracle_charset }} 
+    lineinfile:
+      path: "/etc/init.d/oracledb_{{ oracle_sid }}-19c"
+      regexp: '^export CHARSET='
+      line: "export CHARSET={{ oracle_charset }}"
+
+  - name: Setting oracle listener name to {{ oracle_listener_name }} 
+    lineinfile:
+      path: "/etc/init.d/oracledb_{{ oracle_sid }}-19c"
+      regexp: '^export LISTENER_NAME='
+      line: "export LISTENER_NAME={{ oracle_listener_name }}"
+
+  - name: Setting oracle listener port to {{ oracle_listener_port }}
+    lineinfile:
+      path: "/etc/sysconfig/oracledb_{{ oracle_sid }}-19c.conf"
+      regexp: '^LISTENER_PORT='
+      line: 'LISTENER_PORT={{ oracle_listener_port }}'
+
+  - name: Setting oracle data location to {{ oracle_data_location }}
+    lineinfile:
+      path: "/etc/sysconfig/oracledb_{{ oracle_sid }}-19c.conf"
+      regexp: '^ORACLE_DATA_LOCATION='
+      line: 'ORACLE_DATA_LOCATION={{ oracle_data_location }}'
+
+  - name: Create oracle data directory {{ oracle_data_location }}
+    file:
+      path: "{{ oracle_data_location }}"
+      state: directory
+      recurse: yes
+      owner: oracle
+      group: oinstall
+
+  - name: Check DB has been created already
+    become: true
+    stat:
+      path: "/opt/oracle/cfgtoollogs/dbca/{{ oracle_sid }}/{{ oracle_sid }}.log"
+    register: oralog_result
+
+  - name: Running dbca in auto mode to create {{ oracle_sid }} database
+    become: true
+    shell:
+      cmd: "/etc/init.d/oracledb_{{ oracle_sid }}-19c configure"
+    when: not oralog_result.stat.exists
+  

@@ -1,0 +1,15 @@
+---
+
+
+- hosts: srvora_group
+  remote_user: linux
+  become: yes
+  vars_files:
+    - ["vars/default.yml"]
+    - ["vars/secret.yml"]
+  vars:
+    appname: srvora
+  roles:
+    - common
+    - ora19c
+

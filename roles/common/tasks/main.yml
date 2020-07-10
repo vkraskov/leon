@@ -1,0 +1,25 @@
+---
+  - name: Install common software packages
+    become: true
+    yum:
+      state: present
+      name: 
+        - sysstat
+        - iotop
+        - screen
+
+  - name: "add .vimrc for oracle user"
+    template: src=files/vimrc dest=/home/oracle/.vimrc owner=oracle group=oinstall mode="600"
+
+  - name: install the nginx rpm from a remote repo
+    yum:
+      state: present
+      name: "{{ epel_url }}"
+  
+  - name: Install rlwrap software package
+    become: true
+    yum:
+      state: present
+      name: 
+        - rlwrap
+

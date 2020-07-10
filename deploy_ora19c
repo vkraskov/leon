@@ -1,0 +1,5 @@
+#!/usr/bin/bash 
+
+ansible-playbook deploy_ora19c.yml -i ora_hosts 
+
+

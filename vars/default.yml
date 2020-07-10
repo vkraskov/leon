@@ -1,0 +1,18 @@
+
+oracle_database_preinstall_pkg: oracle-database-preinstall-19c
+
+oracle_rmp_directory: /Users/vkraskov/Downloads/
+oracle_database_server_pkg: oracle-database-ee-19c-1.0-1.x86_64.rpm
+
+oracle_sid: ORADB
+oracle_cdb: false
+oracle_charset: AL32UTF8
+
+oracle_listener_name: "LISTENER_{{ oracle_sid }}"
+oracle_listener_port: 1522
+
+oracle_data_location: "/oradata/"
+
+epel_url: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
+

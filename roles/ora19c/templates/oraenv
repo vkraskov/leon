@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+
+export ORACLE_HOME=/opt/oracle/product/19c/dbhome_1
+export ORACLE_BASE=$ORACLE_HOME/bin/orabase
+export ORACLE_VERSION=19c
+export ORACLE_SID={{ oracle_sid }}
+
+export TNS_ADMIN=$ORACLE_HOME/network/admin
+export ORA_NLS10=$ORACLE_HOME/nls/data
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ORACLE_HOME/lib
+export PATH=$ORACLE_HOME/bin:$PATH
+
+export ORATAB=/etc/oratab
+export ORACLE_TERM=vt100
+export ORAINST=$ORACLE_HOME/oraInst.loc
+export ORAINV=$ORACLE_HOME/oraInventory
+export NLS_LANG=AMERICAN_AMERICA.UTF8
+
+alias sqlplus='rlwrap sqlplus'
+
+PS1='\u[$ORACLE_SID]@\h $ '
+

@@ -1,0 +1,3 @@
+[srvora_group]
+leon ansible_ssh_port=3333
+
